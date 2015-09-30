@@ -44,6 +44,6 @@
 	</build>
 	<properties>
 		<java.version>1.7</java.version>
-		<main.class>ca.jonsimpson.comp3203.filetransfersystem.Main</main.class>
+		<main.class>ca.jonsimpson.comp3203.filetransfersystem.ClientMain</main.class>
 	</properties>
 </project>
