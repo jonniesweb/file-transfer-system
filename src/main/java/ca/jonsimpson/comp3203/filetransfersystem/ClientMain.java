@@ -1,13 +1,18 @@
 package ca.jonsimpson.comp3203.filetransfersystem;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.UnknownHostException;
 
 /**
  * Launch a client which connects to a server to download/upload files.
  */
-public class ClientMain {
+public class ClientMain extends Net {
 	
+	private BufferedReader reader;
+	Client client = null;
+
 	public static void main(String[] args) {
 		new ClientMain(args[0], Integer.parseInt(args[1]));
 	}
@@ -20,14 +25,24 @@ public class ClientMain {
 	 * @param port
 	 */
 	public ClientMain(String host, int port) {
-		Client client = null;
 		try {
 			System.out.println("connecting to client on " + host + " " + port);
 			client = new Client(host, port);
 			
+			// do initial hello with server
 			System.out.println("sending server hello message");
 			client.hello();
 			System.out.println("received hello response");
+			
+			// setup stdin
+			reader = new BufferedReader(new InputStreamReader(System.in));
+			
+			// read commands from stdin indefinitely
+			boolean isRunning = true;
+			while (isRunning) {
+				processCommands();
+			}
+			
 			
 		} catch (UnknownHostException e) {
 			System.out.println("unknown host: " + e.getMessage());
@@ -41,4 +56,44 @@ public class ClientMain {
 			
 		}
 	}
+
+	private void processCommands() throws IOException {
+		
+		String input = reader.readLine();
+		String[] strings = input.split(" ");
+		
+		// dont do anything if the line is empty
+		if (strings.length == 0) {
+			return;
+		}
+		
+		switch (strings[0]) {
+		case LS:
+			String dirListing = client.getDirListing();
+			System.out.println();
+			System.out.println(dirListing);
+			System.out.println();
+			break;
+		
+		default:
+			break;
+		}
+		
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 }

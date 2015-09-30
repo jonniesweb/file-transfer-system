@@ -18,13 +18,25 @@ public class Client extends Net {
 	}
 	
 	public void hello() throws IOException {
-		outputStream.writeUTF(HELLO);
-		outputStream.flush();
+		writeCommand(HELLO);
 		
-		if (HELLO.equals(inputStream.readUTF())) {
+		if (HELLO.equals(readCommand())) {
 			System.out.println("received hello from server");
 		} else {
 			throw new IOException("didn't receive hello message");
+		}
+	}
+
+	public String getDirListing() throws IOException {
+		writeCommand(LS);
+		
+		// get status of command
+		String command = readCommand();
+		if (OK.equals(command)) {
+			return readCommand();
+		} else {
+			System.out.println("unable to read contents of directory");
+			return null;
 		}
 	}
 }

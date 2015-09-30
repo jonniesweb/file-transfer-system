@@ -5,8 +5,12 @@ import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.EOFException;
+import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 public class Connection extends Net {
 	
@@ -29,6 +33,7 @@ public class Connection extends Net {
 				
 				switch (readCommand()) {
 				case LS:
+					commandOK();
 					processDirListing();
 					break;
 				
@@ -47,12 +52,30 @@ public class Connection extends Net {
 	}
 	
 	/**
-	 * Send the client the current directory's listing of files.
+	 * Let the client know that the command they sent is correct and valid
+	 * @throws IOException
 	 */
-	private void processDirListing() {
-		
+	private void commandOK() throws IOException {
+		writeCommand(OK);
 	}
 
+	/**
+	 * Send the client the current directory's listing of files.
+	 * @throws IOException 
+	 */
+	private void processDirListing() throws IOException {
+		System.out.println("processing directory listing");
+		DirectoryStream<Path> directoryStream = Files.newDirectoryStream(new File("/").toPath());
+		
+		StringBuffer stringBuffer = new StringBuffer();
+		for (Path path : directoryStream) {
+			stringBuffer.append(path.getFileName());
+			stringBuffer.append("\n");
+		}
+		
+		writeCommand(stringBuffer.toString());
+	}
+	
 	private void initialHello() throws IOException {
 		System.out.println("waiting for hello message");
 		String command = readCommand();
