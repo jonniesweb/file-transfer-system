@@ -75,6 +75,9 @@ public class ClientMain extends Net {
 			System.out.println();
 			break;
 		
+		case GET:
+			client.getFile(strings[1]);
+			break;
 		default:
 			break;
 		}

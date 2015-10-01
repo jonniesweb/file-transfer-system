@@ -19,6 +19,7 @@ public class Net {
 	public static final String OK = "ok";
 	public static final String ACCESS_DENIED = "access_denied";
 	public static final String INVALID_COMMAND = "invalid_command";
+	public static final String INVALID_FILE = "invalid_file";
 	public static final String ERROR = "error";
 	
 	// 

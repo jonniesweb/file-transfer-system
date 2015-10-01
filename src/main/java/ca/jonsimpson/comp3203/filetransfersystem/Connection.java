@@ -5,14 +5,17 @@ import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.EOFException;
-import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class Connection extends Net {
+	
+	private Path path = Paths.get(System.getProperty("user.dir"));
 	
 	public Connection(Socket socket) throws IOException {
 		this.socket = socket;
@@ -33,14 +36,46 @@ public class Connection extends Net {
 				
 				switch (readCommand()) {
 				case LS:
-					commandOK();
+					sendOKCommand();
 					processDirListing();
 					break;
 				
+				case GET:
+					String fileName = readCommand();
+					try {
+						Path filePath = path.resolve(fileName);
+						System.out.println("processing GET for: " + filePath);
+						
+						if (Files.isReadable(filePath)) {
+							sendOKCommand();
+							
+							// file exists and is readable
+							
+							// send the file length
+							long fileLength = filePath.toFile().length();
+							outputStream.writeInt((int) fileLength);
+							outputStream.flush();
+							
+							// send the file
+							System.out.println("beginning to copy file");
+							Files.copy(filePath, outputStream);
+							outputStream.flush();
+							System.out.println("finished copying file");
+						} else {
+							// file is not valid
+							System.out.println("file does not exist");
+							sendInvalidFileCommand();
+						}
+						
+					} catch (InvalidPathException e) {
+						System.out.println("invalid path: " + path + "/" + fileName);
+						sendErrorCommand();
+					}
+					
+					break;
 				default:
 					break;
 				}
-				
 				
 			}
 		} catch (EOFException e) {
@@ -51,21 +86,32 @@ public class Connection extends Net {
 		}
 	}
 	
-	/**
-	 * Let the client know that the command they sent is correct and valid
-	 * @throws IOException
-	 */
-	private void commandOK() throws IOException {
-		writeCommand(OK);
+	private void sendInvalidFileCommand() throws IOException {
+		writeCommand(INVALID_FILE);
 	}
 
+	private void sendErrorCommand() throws IOException {
+		writeCommand(ERROR);
+		
+	}
+	
+	/**
+	 * Let the client know that the command they sent is correct and valid
+	 * 
+	 * @throws IOException
+	 */
+	private void sendOKCommand() throws IOException {
+		writeCommand(OK);
+	}
+	
 	/**
 	 * Send the client the current directory's listing of files.
-	 * @throws IOException 
+	 * 
+	 * @throws IOException
 	 */
 	private void processDirListing() throws IOException {
 		System.out.println("processing directory listing");
-		DirectoryStream<Path> directoryStream = Files.newDirectoryStream(new File("/").toPath());
+		DirectoryStream<Path> directoryStream = Files.newDirectoryStream(getCurrentDirectory());
 		
 		StringBuffer stringBuffer = new StringBuffer();
 		for (Path path : directoryStream) {
@@ -74,6 +120,10 @@ public class Connection extends Net {
 		}
 		
 		writeCommand(stringBuffer.toString());
+	}
+	
+	private Path getCurrentDirectory() {
+		return path;
 	}
 	
 	private void initialHello() throws IOException {
