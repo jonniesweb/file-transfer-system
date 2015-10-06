@@ -14,6 +14,10 @@ import java.nio.file.Paths;
 
 import org.apache.commons.io.IOUtils;
 
+/**
+ * Communicate with the Server, containing the business logic for the file
+ * transfer system.
+ */
 public class Client extends Net {
 	
 	public Client(String host, int port) throws UnknownHostException, IOException {
@@ -23,6 +27,16 @@ public class Client extends Net {
 		inputStream = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
 	}
 	
+	/**
+	 * Send the server a simple hello message.
+	 * 
+	 * <br>
+	 * <h1>Sequence:</h1>
+	 * <ol>
+	 * <li>Client sends <code>HELLO</code> message to Server</li>
+	 * <li>Server sends <code>HELLO</code> message to Client</li>
+	 * </ol>
+	 */
 	public void hello() throws IOException {
 		writeCommand(HELLO);
 		
@@ -33,6 +47,20 @@ public class Client extends Net {
 		}
 	}
 	
+	/**
+	 * Get the current listing of files and directories from the current
+	 * directory.
+	 * 
+	 * <br>
+	 * <ol>
+	 * <li>Client sends <code>LS</code> command to Server
+	 * <li>Server sends <code>OK</code> status code if valid command
+	 * <li>Server sends String containing list of files
+	 * </ol>
+	 * 
+	 * @return
+	 * @throws IOException
+	 */
 	public String getDirListing() throws IOException {
 		writeCommand(LS);
 		
@@ -45,6 +73,21 @@ public class Client extends Net {
 		}
 	}
 	
+	/**
+	 * Get the file on the remote server with the name <code>fileName</code>.
+	 * Files will be placed in the client's home directory as specified by the
+	 * <code>user.dir</code> property set by the JVM.
+	 * 
+	 * <br>
+	 * <h1>Valid filenames include:</h1>
+	 * <ul>
+	 * <li>file.txt
+	 * <li>Downloads/file2.txt
+	 * </ul>
+	 * 
+	 * @param fileName
+	 * @throws IOException
+	 */
 	public void getFile(String fileName) throws IOException {
 		writeCommand(GET);
 		writeCommand(fileName);
@@ -76,17 +119,5 @@ public class Client extends Net {
 			System.out.println("An error occurred. Unable to get file" + fileName);
 		}
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	
 }

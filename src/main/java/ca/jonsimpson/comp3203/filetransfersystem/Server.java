@@ -20,7 +20,7 @@ public class Server {
 				Socket socket = serverSocket.accept();
 				
 				System.out.println("received connection from " + socket.getInetAddress());
-				Connection connection = new Connection(socket);
+				ServerConnection connection = new ServerConnection(socket);
 				
 				System.out.println("begin processing connection");
 				connection.process();
