@@ -116,6 +116,12 @@ public class ServerConnection extends Net {
 		StringBuffer stringBuffer = new StringBuffer();
 		for (Path path : directoryStream) {
 			stringBuffer.append(path.getFileName());
+			
+			// if the path is a directory, append the '/' character
+			if (Files.isDirectory(path)) {
+				stringBuffer.append('/');	
+			}
+			// insert a newline character
 			stringBuffer.append("\n");
 		}
 		
