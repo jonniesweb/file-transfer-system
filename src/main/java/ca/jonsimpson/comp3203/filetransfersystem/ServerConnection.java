@@ -13,11 +13,11 @@ import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public class Connection extends Net {
+public class ServerConnection extends Net {
 	
 	private Path path = Paths.get(System.getProperty("user.dir"));
 	
-	public Connection(Socket socket) throws IOException {
+	public ServerConnection(Socket socket) throws IOException {
 		this.socket = socket;
 		outputStream = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
 		inputStream = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
