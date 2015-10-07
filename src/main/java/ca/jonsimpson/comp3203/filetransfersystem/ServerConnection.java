@@ -38,7 +38,6 @@ public class ServerConnection extends Net {
 				
 				switch (readCommand()) {
 				case LS:
-					sendOKCommand();
 					processDirListing();
 					break;
 				
@@ -96,7 +95,6 @@ public class ServerConnection extends Net {
 		
 		String parsedPath = FilenameUtils.concat(path.toString(), directory);
 		Path newPath = Paths.get(parsedPath);
-		System.out.println("concatpath: " + newPath);
 		
 		// verify that this directory exists
 		if (!Files.exists(newPath)) {
@@ -108,6 +106,12 @@ public class ServerConnection extends Net {
 		// verify that this path is a directory
 		if (!Files.isDirectory(newPath)) {
 			System.out.println("path is not a directory: " + newPath);
+			sendErrorCommand();
+			return;
+		}
+		
+		if (!Files.isReadable(newPath)) {
+			System.out.println("path is not readable: " + newPath);
 			sendErrorCommand();
 			return;
 		}
@@ -144,7 +148,17 @@ public class ServerConnection extends Net {
 	 */
 	private void processDirListing() throws IOException {
 		System.out.println("processing directory listing");
-		DirectoryStream<Path> directoryStream = Files.newDirectoryStream(getCurrentDirectory());
+		
+		Path currentDirectory = getCurrentDirectory();
+		if (!Files.isReadable(currentDirectory)) {
+			System.out.println("directory is unreadable - access denied");
+			sendErrorCommand();
+			return;
+		}
+		
+		DirectoryStream<Path> directoryStream = Files.newDirectoryStream(currentDirectory);
+		
+		sendOKCommand();
 		
 		StringBuffer stringBuffer = new StringBuffer();
 		for (Path path : directoryStream) {

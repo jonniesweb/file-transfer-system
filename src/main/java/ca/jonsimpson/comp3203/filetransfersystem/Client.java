@@ -61,15 +61,17 @@ public class Client extends Net {
 	 * @return
 	 * @throws IOException
 	 */
-	public String getDirListing() throws IOException {
+	public void getDirListing() throws IOException {
 		writeCommand(LS);
 		
 		// get status of command
 		if (OK.equals(readCommand())) {
-			return readCommand();
+			System.out.println();
+			System.out.println(readCommand());
+			System.out.println();
+			
 		} else {
 			System.out.println("unable to read contents of directory");
-			return null;
 		}
 	}
 	

@@ -69,10 +69,7 @@ public class ClientMain extends Net {
 		
 		switch (strings[0]) {
 		case LS:
-			String dirListing = client.getDirListing();
-			System.out.println();
-			System.out.println(dirListing);
-			System.out.println();
+			client.getDirListing();
 			break;
 		
 		case GET:
