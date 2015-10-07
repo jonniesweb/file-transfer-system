@@ -78,6 +78,10 @@ public class ClientMain extends Net {
 		case GET:
 			client.getFile(strings[1]);
 			break;
+			
+		case CD:
+			client.changeDirectory(strings[1]);
+			break;
 		default:
 			break;
 		}

@@ -98,6 +98,7 @@ public class Client extends Net {
 			int fileLength = inputStream.readInt();
 			byte[] bytes = new byte[fileLength];
 			
+			// XXX CHANGE ME!!!!!!!!!
 			Path pathName = Paths.get(System.getProperty("user.dir") + "/target/");
 			Path path = pathName.resolve(fileName);
 			
@@ -118,6 +119,27 @@ public class Client extends Net {
 		} else {
 			System.out.println("An error occurred. Unable to get file" + fileName);
 		}
+	}
+	
+	/**
+	 * Change the current directory to that of <code>directory</code>, relative
+	 * to the current directory, or absolutely if <code>directory</code> starts
+	 * with a '/'. If the specified directory is <code>..</code>, then the CWD
+	 * is moved up a directory to the parent.
+	 * 
+	 * @param directory
+	 * @throws IOException
+	 */
+	public void changeDirectory(String directory) throws IOException {
+		writeCommand(CD);
+		writeCommand(directory);
+		
+		if (OK.equals(readCommand())) {
+			System.out.println("Changed directories successfully");
+		} else {
+			System.out.println("Failed to change directories");
+		}
+		
 	}
 	
 }

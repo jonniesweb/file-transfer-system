@@ -13,6 +13,8 @@ import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import org.apache.commons.io.FilenameUtils;
+
 public class ServerConnection extends Net {
 	
 	private Path path = Paths.get(System.getProperty("user.dir"));
@@ -73,6 +75,10 @@ public class ServerConnection extends Net {
 					}
 					
 					break;
+				
+				case CD:
+					processChangeDirectory(readCommand());
+					break;
 				default:
 					break;
 				}
@@ -86,10 +92,37 @@ public class ServerConnection extends Net {
 		}
 	}
 	
+	private void processChangeDirectory(String directory) throws IOException {
+		
+		String parsedPath = FilenameUtils.concat(path.toString(), directory);
+		Path newPath = Paths.get(parsedPath);
+		System.out.println("concatpath: " + newPath);
+		
+		// verify that this directory exists
+		if (!Files.exists(newPath)) {
+			System.out.println("path does not exist: " + newPath);
+			sendErrorCommand();
+			return;
+		}
+		
+		// verify that this path is a directory
+		if (!Files.isDirectory(newPath)) {
+			System.out.println("path is not a directory: " + newPath);
+			sendErrorCommand();
+			return;
+		}
+		
+		// set the path
+		path = newPath;
+		
+		System.out.println("changing directory to: " + newPath);
+		sendOKCommand();
+	}
+	
 	private void sendInvalidFileCommand() throws IOException {
 		writeCommand(INVALID_FILE);
 	}
-
+	
 	private void sendErrorCommand() throws IOException {
 		writeCommand(ERROR);
 		
@@ -119,7 +152,7 @@ public class ServerConnection extends Net {
 			
 			// if the path is a directory, append the '/' character
 			if (Files.isDirectory(path)) {
-				stringBuffer.append('/');	
+				stringBuffer.append('/');
 			}
 			// insert a newline character
 			stringBuffer.append("\n");
