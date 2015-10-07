@@ -42,42 +42,13 @@ public class ServerConnection extends Net {
 					break;
 				
 				case GET:
-					String fileName = readCommand();
-					try {
-						Path filePath = path.resolve(fileName);
-						System.out.println("processing GET for: " + filePath);
-						
-						if (Files.isReadable(filePath)) {
-							sendOKCommand();
-							
-							// file exists and is readable
-							
-							// send the file length
-							long fileLength = filePath.toFile().length();
-							outputStream.writeInt((int) fileLength);
-							outputStream.flush();
-							
-							// send the file
-							System.out.println("beginning to copy file");
-							Files.copy(filePath, outputStream);
-							outputStream.flush();
-							System.out.println("finished copying file");
-						} else {
-							// file is not valid
-							System.out.println("file does not exist");
-							sendInvalidFileCommand();
-						}
-						
-					} catch (InvalidPathException e) {
-						System.out.println("invalid path: " + path + "/" + fileName);
-						sendErrorCommand();
-					}
-					
+					processFileDownload();
 					break;
 				
 				case CD:
 					processChangeDirectory(readCommand());
 					break;
+					
 				default:
 					break;
 				}
@@ -88,6 +59,39 @@ public class ServerConnection extends Net {
 			isRunning = false;
 		} catch (IOException e) {
 			e.printStackTrace();
+		}
+	}
+
+	private void processFileDownload() throws IOException {
+		String fileName = readCommand();
+		try {
+			Path filePath = path.resolve(fileName);
+			System.out.println("processing GET for: " + filePath);
+			
+			if (Files.isReadable(filePath)) {
+				sendOKCommand();
+				
+				// file exists and is readable
+				
+				// send the file length
+				long fileLength = filePath.toFile().length();
+				outputStream.writeInt((int) fileLength);
+				outputStream.flush();
+				
+				// send the file
+				System.out.println("beginning to copy file");
+				Files.copy(filePath, outputStream);
+				outputStream.flush();
+				System.out.println("finished copying file");
+			} else {
+				// file is not valid
+				System.out.println("file does not exist");
+				sendInvalidFileCommand();
+			}
+			
+		} catch (InvalidPathException e) {
+			System.out.println("invalid path: " + path + "/" + fileName);
+			sendErrorCommand();
 		}
 	}
 	
