@@ -13,9 +13,21 @@ public class ClientMain extends Net {
 	
 	private BufferedReader reader;
 	Client client = null;
-
+	
 	public static void main(String[] args) {
-		new ClientMain(args[0], Integer.parseInt(args[1]));
+		try {
+			new ClientMain(getParam0(args), Integer.parseInt(getParam1(args)));
+		} catch (NumberFormatException e) {
+			System.out.println("Invalid port number");
+			printUsage();
+		} catch (ParameterException e) {
+			System.out.println("Must use two parameters");
+			printUsage();
+		}
+	}
+	
+	private static void printUsage() {
+		System.out.println("Usage: java -jar client.jar <ip address> <port number>");
 	}
 	
 	/**
@@ -46,7 +58,6 @@ public class ClientMain extends Net {
 				processCommands();
 			}
 			
-			
 		} catch (UnknownHostException e) {
 			System.out.println("unknown host: " + e.getMessage());
 			e.printStackTrace();
@@ -59,11 +70,11 @@ public class ClientMain extends Net {
 			
 		}
 	}
-
+	
 	private void printCWD() {
 		System.out.println("Current local working directory is: " + Paths.get("").toAbsolutePath());
 	}
-
+	
 	private void processCommands() throws IOException {
 		
 		String input = reader.readLine();
@@ -74,40 +85,57 @@ public class ClientMain extends Net {
 			return;
 		}
 		
-		switch (strings[0]) {
-		case LS:
-			client.getDirListing();
-			break;
-		
-		case GET:
-			client.getFile(strings[1]);
-			break;
+		try {
+			switch (getParam0(strings)) {
+			case LS:
+				client.getDirListing();
+				break;
 			
-		case CD:
-			client.changeDirectory(strings[1]);
-			break;
+			case GET:
+				client.getFile(getParam1(strings));
+				break;
 			
-		case PUT:
-			client.putFile(strings[1]);
-		default:
-			break;
+			case CD:
+				client.changeDirectory(getParam1(strings));
+				break;
+			
+			case PUT:
+				client.putFile(getParam1(strings));
+			default:
+				break;
+			}
+			
+		} catch (ParameterException e) {
+			System.out.println("Invalid number of parameters," + e.getMessage());
 		}
 		
 	}
 	
+	private static String getParam1(String[] strings) throws ParameterException {
+		if (strings.length < 2) {
+			throw new ParameterException("Need 2 parameters");
+		}
+		
+		return strings[1];
+	}
 	
+	private static String getParam0(String[] strings) throws ParameterException {
+		if (strings.length < 1) {
+			throw new ParameterException("Needs 1 parameter");
+		}
+		
+		return strings[0];
+	}
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+	/**
+	 * An error thrown when the number of parameters required isn't met.
+	 */
+	static final class ParameterException extends Exception {
+		
+		public ParameterException(String message) {
+			super(message);
+		}
+		
+	}
 	
 }

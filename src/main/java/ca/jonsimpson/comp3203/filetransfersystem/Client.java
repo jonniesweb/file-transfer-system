@@ -115,7 +115,8 @@ public class Client extends Net {
 			fileOutputStream.write(bytes);
 			fileOutputStream.close();
 			
-			System.out.println("successfully copied file " + fileName + " to " + pathName);
+			System.out.println("successfully copied file " + fileName + " to "
+					+ pathName.toAbsolutePath());
 			
 		} else if (INVALID_FILE.equals(command)) {
 			System.out.println("file does not exist: " + fileName);
@@ -151,7 +152,7 @@ public class Client extends Net {
 	 * directory. The same filename is kept.
 	 * 
 	 * @param fileName
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	public void putFile(String fileName) throws IOException {
 		
@@ -165,7 +166,6 @@ public class Client extends Net {
 				writeCommand(PUT);
 				writeCommand(fileName);
 				System.out.println("wrote PUT command and fileName");
-				
 				
 				System.out.println("waiting for server's OK");
 				// verfiy server is cool with the PUT command
@@ -193,17 +193,6 @@ public class Client extends Net {
 			System.out.println("invalid path: " + currentDir + "/" + fileName);
 		}
 		
-		
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	
 }

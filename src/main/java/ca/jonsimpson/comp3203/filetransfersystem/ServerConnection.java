@@ -48,7 +48,7 @@ public class ServerConnection extends Net {
 				case GET:
 					processFileDownload();
 					break;
-					
+				
 				case PUT:
 					processFileUpload();
 					break;
@@ -56,7 +56,7 @@ public class ServerConnection extends Net {
 				case CD:
 					processChangeDirectory(readCommand());
 					break;
-					
+				
 				default:
 					sendErrorCommand();
 					System.out.println("received invalid command: " + command);
@@ -71,7 +71,7 @@ public class ServerConnection extends Net {
 			e.printStackTrace();
 		}
 	}
-
+	
 	private void processFileUpload() throws IOException {
 		System.out.println("processing file upload");
 		
@@ -86,9 +86,8 @@ public class ServerConnection extends Net {
 		int fileSize = inputStream.readInt();
 		System.out.println("read file length");
 		
-		
 		Path filePath = path.resolve(fileName);
-
+		
 		// read in file
 		byte[] bytes = new byte[fileSize];
 		IOUtils.read(inputStream, bytes, 0, fileSize);
@@ -106,7 +105,7 @@ public class ServerConnection extends Net {
 		System.out.println("successfully copied file " + fileName + " to " + filePath);
 		
 	}
-
+	
 	private void processFileDownload() throws IOException {
 		String fileName = readCommand();
 		try {
