@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.UnknownHostException;
+import java.nio.file.Paths;
 
 /**
  * Launch a client which connects to a server to download/upload files.
@@ -37,6 +38,8 @@ public class ClientMain extends Net {
 			// setup stdin
 			reader = new BufferedReader(new InputStreamReader(System.in));
 			
+			printCWD();
+			
 			// read commands from stdin indefinitely
 			boolean isRunning = true;
 			while (isRunning) {
@@ -55,6 +58,10 @@ public class ClientMain extends Net {
 			client.close();
 			
 		}
+	}
+
+	private void printCWD() {
+		System.out.println("Current local working directory is: " + Paths.get("").toAbsolutePath());
 	}
 
 	private void processCommands() throws IOException {
@@ -79,6 +86,9 @@ public class ClientMain extends Net {
 		case CD:
 			client.changeDirectory(strings[1]);
 			break;
+			
+		case PUT:
+			client.putFile(strings[1]);
 		default:
 			break;
 		}

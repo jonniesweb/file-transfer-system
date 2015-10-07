@@ -5,6 +5,8 @@ import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.EOFException;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.nio.file.DirectoryStream;
@@ -14,10 +16,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.io.IOUtils;
 
 public class ServerConnection extends Net {
 	
-	private Path path = Paths.get(System.getProperty("user.dir"));
+	private Path path = Paths.get("");
 	
 	public ServerConnection(Socket socket) throws IOException {
 		this.socket = socket;
@@ -36,7 +39,8 @@ public class ServerConnection extends Net {
 			initialHello();
 			while (isRunning) {
 				
-				switch (readCommand()) {
+				String command = readCommand();
+				switch (command) {
 				case LS:
 					processDirListing();
 					break;
@@ -44,12 +48,18 @@ public class ServerConnection extends Net {
 				case GET:
 					processFileDownload();
 					break;
+					
+				case PUT:
+					processFileUpload();
+					break;
 				
 				case CD:
 					processChangeDirectory(readCommand());
 					break;
 					
 				default:
+					sendErrorCommand();
+					System.out.println("received invalid command: " + command);
 					break;
 				}
 				
@@ -60,6 +70,41 @@ public class ServerConnection extends Net {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	private void processFileUpload() throws IOException {
+		System.out.println("processing file upload");
+		
+		// read filename
+		String fileName = readCommand();
+		System.out.println("read in fileName");
+		
+		sendOKCommand();
+		System.out.println("sent OK command");
+		
+		// read file size
+		int fileSize = inputStream.readInt();
+		System.out.println("read file length");
+		
+		
+		Path filePath = path.resolve(fileName);
+
+		// read in file
+		byte[] bytes = new byte[fileSize];
+		IOUtils.read(inputStream, bytes, 0, fileSize);
+		
+		System.out.println("copying file into " + filePath);
+		
+		File file = filePath.toFile();
+		System.out.println(file);
+		
+		FileOutputStream fileOutputStream = new FileOutputStream(file);
+		
+		fileOutputStream.write(bytes);
+		fileOutputStream.close();
+		
+		System.out.println("successfully copied file " + fileName + " to " + filePath);
+		
 	}
 
 	private void processFileDownload() throws IOException {

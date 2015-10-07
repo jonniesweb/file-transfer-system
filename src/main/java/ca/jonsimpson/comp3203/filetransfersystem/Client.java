@@ -9,6 +9,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -100,8 +102,7 @@ public class Client extends Net {
 			int fileLength = inputStream.readInt();
 			byte[] bytes = new byte[fileLength];
 			
-			// XXX CHANGE ME!!!!!!!!!
-			Path pathName = Paths.get(System.getProperty("user.dir") + "/target/");
+			Path pathName = Paths.get("");
 			Path path = pathName.resolve(fileName);
 			
 			IOUtils.read(inputStream, bytes, 0, fileLength);
@@ -143,5 +144,66 @@ public class Client extends Net {
 		}
 		
 	}
+	
+	/**
+	 * Copy the file, represented by <code>fileName</code>, from the directory
+	 * where you launched the program into the server's current working
+	 * directory. The same filename is kept.
+	 * 
+	 * @param fileName
+	 * @throws IOException 
+	 */
+	public void putFile(String fileName) throws IOException {
+		
+		// get the directory where this program was started
+		Path currentDir = Paths.get("");
+		
+		try {
+			Path filePath = currentDir.resolve(fileName);
+			// check if path is readable and is a file
+			if (Files.isReadable(filePath) && Files.isRegularFile(filePath)) {
+				writeCommand(PUT);
+				writeCommand(fileName);
+				System.out.println("wrote PUT command and fileName");
+				
+				
+				System.out.println("waiting for server's OK");
+				// verfiy server is cool with the PUT command
+				if (!OK.equals(readCommand())) {
+					System.out.println("Failed to copy file to server");
+					return;
+				}
+				
+				System.out.println("server said OK, lets send the file");
+				
+				// send file size
+				File file = filePath.toFile();
+				outputStream.writeInt((int) file.length());
+				
+				// send file
+				System.out.println("begin copying file");
+				Files.copy(filePath, outputStream);
+				outputStream.flush();
+				System.out.println("finished copying file");
+				
+			} else {
+				System.out.println("file does not exist or is not a file");
+			}
+		} catch (InvalidPathException e) {
+			System.out.println("invalid path: " + currentDir + "/" + fileName);
+		}
+		
+		
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 }
