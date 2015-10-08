@@ -207,7 +207,7 @@ public class Client extends Net {
 			System.out.println("successfully created directory: " + dirName);
 			
 		} else {
-			System.out.println("An error occurred creating the directory");
+			System.out.println("Failed to create the directory, already exists");
 		}
 		
 	}
