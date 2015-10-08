@@ -9,7 +9,12 @@ import java.io.IOException;
 public class ServerMain {
 	
 	public static void main(String[] args) {
-		new ServerMain(Integer.parseInt(args[0]));
+		if (args.length >= 1) {
+			new ServerMain(Integer.parseInt(args[0]));
+		} else {
+			new ServerMain(45000);
+		}
+		
 	}
 	
 	/**
