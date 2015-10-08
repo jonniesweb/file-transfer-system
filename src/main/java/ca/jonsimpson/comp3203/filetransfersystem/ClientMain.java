@@ -101,6 +101,9 @@ public class ClientMain extends Net {
 			
 			case PUT:
 				client.putFile(getParam1(strings));
+				
+			case MKDIR:
+				client.makeDirectory(getParam1(strings));
 			default:
 				break;
 			}

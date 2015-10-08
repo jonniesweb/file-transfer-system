@@ -10,6 +10,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.nio.file.DirectoryStream;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
@@ -57,6 +58,10 @@ public class ServerConnection extends Net {
 					processChangeDirectory(readCommand());
 					break;
 				
+				case MKDIR:
+					processCreateDirectory();
+					break;
+				
 				default:
 					sendErrorCommand();
 					System.out.println("received invalid command: " + command);
@@ -70,6 +75,28 @@ public class ServerConnection extends Net {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	private void processCreateDirectory() throws IOException {
+		// read in the directory name
+		String dirName = readCommand();
+		
+		// find the absolute directory in relation to the CWD
+		String dirPath = FilenameUtils.concat(path.toString(), dirName);
+		
+		try {
+			// create the actual directory
+			Files.createDirectory(Paths.get(dirPath));
+		} catch (FileAlreadyExistsException e) {
+			System.out.println("failed to create directory, already exists");
+			sendErrorCommand();
+			return;
+		}
+		
+		// successfully created the directory
+		System.out.println("created directory: " + dirPath);
+		sendOKCommand();
+		
 	}
 	
 	private void processFileUpload() throws IOException {

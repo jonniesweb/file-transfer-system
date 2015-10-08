@@ -195,4 +195,21 @@ public class Client extends Net {
 		
 	}
 	
+	public void makeDirectory(String dirName) throws IOException {
+		// send the mkdir command
+		writeCommand(MKDIR);
+		
+		// send the directory name to the server
+		writeCommand(dirName);
+		
+		// process success or error messages
+		if (OK.equals(readCommand())) {
+			System.out.println("successfully created directory: " + dirName);
+			
+		} else {
+			System.out.println("An error occurred creating the directory");
+		}
+		
+	}
+	
 }
