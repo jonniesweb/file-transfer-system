@@ -86,28 +86,24 @@ public class ClientMain extends Net {
 		}
 		
 		try {
-			switch (getParam0(strings)) {
-			case LS:
+			String param0 = getParam0(strings);
+			if (LS.equals(param0)) {
 				client.getDirListing();
-				break;
-			
-			case GET:
-				client.getFile(getParam1(strings));
-				break;
-			
-			case CD:
-				client.changeDirectory(getParam1(strings));
-				break;
-			
-			case PUT:
-				client.putFile(getParam1(strings));
-				break;
 				
-			case MKDIR:
+			} else if (GET.equals(param0)) {
+				client.getFile(getParam1(strings));
+				
+			} else if (CD.equals(param0)) {
+				client.changeDirectory(getParam1(strings));
+				
+			} else if (PUT.equals(param0)) {
+				client.putFile(getParam1(strings));
+				
+			} else if (MKDIR.equals(param0)) {
 				client.makeDirectory(getParam1(strings));
-				break;
-			default:
-				break;
+				
+			} else {
+				System.out.println("invalid command");
 			}
 			
 		} catch (ParameterException e) {
